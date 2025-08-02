@@ -20,9 +20,10 @@
         class="flex items-center gap-3 w-full text-left"
         @click="showCourseDropdown = !showCourseDropdown"
       >
-        <img src="/images/avatar.jpg" class="w-12 h-12 rounded-lg" />
+        <img :src="`/images/${currentCourse?.avatar}`" :alt="currentCourse?.instructor" class="w-12 h-12 rounded-lg" />
         <div class="flex flex-col">
-          <span class="text-sm font-medium leading-tight">Banjo with Noam Pikelny</span>
+          <span class="text-sm font-medium leading-tight">{{ currentCourse?.category }}</span>
+          <span class="text-sm font-medium leading-tight">{{ currentCourse?.instructor }}</span>
         </div>
         <Icon name="chevrons-up-down" class="ml-auto text-gray-400" />
       </button>
@@ -31,6 +32,16 @@
         v-if="showCourseDropdown"
         class="absolute left-0 right-0 mt-2 bg-[#01142c] border border-[#1f3a5f] rounded-lg shadow-lg z-30"
       >
+        <ul>
+          <li
+            v-for="course in courses"
+            :key="course.id"
+            @click="selectCourse(course)"
+            class="px-4 py-2 hover:bg-[#1f3a5f] cursor-pointer text-sm"
+          >
+            {{ course.title }}
+          </li>
+        </ul>
       </div>
     </div>
 
@@ -38,7 +49,7 @@
     <nav class="mt-6 flex-1 p-4 space-y-4" :class="{ 'p-2': collapsed }">
       <div class="space-y-1">
         <SidebarLink icon="home" label="Home" to="/" :collapsed="collapsed" />
-        <SidebarLink icon="play" label="Lessons" :to="/courses/" :collapsed="collapsed" />
+        <SidebarLink icon="play" label="Lessons" :to="`/courses/${currentCourseSlug}`" :collapsed="collapsed" />
         <SidebarLink icon="refresh-ccw" label="Video Exchanges" to="/exchanges" :collapsed="collapsed" />
         <SidebarLink icon="book-open" label="Study Materials" to="/materials" :collapsed="collapsed" />
         <SidebarLink icon="bookmark-outline" label="Bookmarks" to="/bookmarks" :collapsed="collapsed" />
@@ -104,9 +115,18 @@ import { useAuth } from '@/composables/useAuth'
 import { onClickOutside } from '@vueuse/core'
 import SidebarLink from '@/components/layout/SidebarLink.vue'
 import Icon from '@/components/ui/Icon.vue'
+import { useCourses } from '@/composables/useCourses'
+import { useCurrentCourse } from '@/composables/useCurrentCourse'
+import { Course } from '@/types/course'
 
 const route = useRoute()
 const router = useRouter()
+
+const { courses } = useCourses()
+const { currentCourseSlug } = useCurrentCourse()
+const currentCourse = computed(() =>
+  courses.value.find(c => c.slug === currentCourseSlug.value)
+)
 
 const props = defineProps<{ show: boolean; collapsed: boolean }>()
 const emit = defineEmits(['toggleCollapse', 'close'])
@@ -122,6 +142,10 @@ onClickOutside(courseDropdownRef, () => {
   showCourseDropdown.value = false
 })
 
+function selectCourse(course: Course) {
+  showCourseDropdown.value = false
+  router.push(`/courses/${course.slug}`)
+}
 
 function handleSignOut() {
   logout()
