@@ -3,6 +3,7 @@
     <video ref="videoRef" class="w-full h-full" :src="src" controls @play="emit('update:isPlaying', true)"
       @pause="emit('update:isPlaying', false)" />
 
+    <!-- Play/Pause button overlay -->
     <button v-if="!props.isPlaying" @click="playVideo"
       class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-24 h-24">
@@ -10,7 +11,6 @@
         <polygon points="19,15 36,24 19,33" fill="white" />
       </svg>
     </button>
-
     <button v-else @click="pauseVideo" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
              opacity-0 group-hover:opacity-100 transition-opacity duration-200">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-24 h-24">
@@ -24,18 +24,18 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
-
+const videoRef = ref<HTMLVideoElement | null>(null)
 const props = defineProps<{
   src: string
   isPlaying: boolean
   initialProgress?: number
 }>()
 
+// Interval for tracking video progress
+let interval: ReturnType<typeof setInterval> | null = null
 const emit = defineEmits(['update:isPlaying', 'progress'])
 
-const videoRef = ref<HTMLVideoElement | null>(null)
-let interval: ReturnType<typeof setInterval> | null = null
-
+// Play and Pause functions
 function playVideo() {
   videoRef.value?.play()
   emit('update:isPlaying', true)
@@ -46,6 +46,7 @@ function pauseVideo() {
   emit('update:isPlaying', false)
 }
 
+// Handle video loaded data to set initial progress
 function handleLoadedData() {
   if (props.initialProgress && videoRef.value) {
     const duration = videoRef.value.duration
@@ -58,6 +59,7 @@ function handleLoadedData() {
   }
 }
 
+// Start and stop progress tracking
 function startProgressTracking() {
   interval = setInterval(() => {
     if (videoRef.value && props.isPlaying) {
@@ -75,6 +77,7 @@ function stopProgressTracking() {
   }
 }
 
+// Lifecycle hooks to manage video events and progress tracking
 onMounted(() => {
   videoRef.value?.addEventListener('loadeddata', handleLoadedData)
   startProgressTracking()
@@ -85,6 +88,7 @@ onBeforeUnmount(() => {
   stopProgressTracking()
 })
 
+// Watch for changes in isPlaying to start/stop progress tracking
 watch(() => props.isPlaying, (val) => {
   if (val) startProgressTracking()
   else stopProgressTracking()
