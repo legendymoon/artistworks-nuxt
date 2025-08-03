@@ -1,5 +1,6 @@
 <template>
     <div class="px-2 sm:px-10 pt-14 min-h-full">
+        <!-- Title and Metadata -->
         <h1 class="text-[44px] sm:text-[56px] font-bold mb-4">{{ level.charAt(0).toUpperCase() + level.slice(1) }}</h1>
         <div class="text-[12px] sm:text-[22px] text-gray-600 mb-8">
             <span>{{ totalLessons  }} Topics</span>
