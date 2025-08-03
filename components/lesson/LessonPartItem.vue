@@ -33,17 +33,17 @@
 </template>
 
 <script setup lang="ts">
-  import { formatSecondsToTime } from '@/utils/formatTime'
+import { formatSecondsToTime } from '@/utils/formatTime'
 
-  const props = defineProps<{
-    part: { id: number; duration: number; progress: number }
-    lesson: { title: string; }
-    index: number
-    active?: boolean
-    isPlaying?: boolean
-    isCurrent?: boolean
-    onPlay?: () => void
-  }>()
+const props = defineProps<{
+  part: { id: number; duration: number; progress: number }
+  lesson: { title: string; }
+  index: number
+  active?: boolean
+  isPlaying?: boolean
+  isCurrent?: boolean
+  onPlay?: () => void
+}>()
 
-  const formattedDuration = formatSecondsToTime(props.part.duration)
+const formattedDuration = formatSecondsToTime(props.part.duration)
 </script>
