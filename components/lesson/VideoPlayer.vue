@@ -1,31 +1,18 @@
 <template>
   <div class="relative w-full aspect-video rounded overflow-hidden bg-black group">
-    <video
-      ref="videoRef"
-      class="w-full h-full"
-      :src="src"
-      controls
-      @play="emit('update:isPlaying', true)"
-      @pause="emit('update:isPlaying', false)"
-    />
+    <video ref="videoRef" class="w-full h-full" :src="src" controls @play="emit('update:isPlaying', true)"
+      @pause="emit('update:isPlaying', false)" />
 
-    <button
-      v-if="!props.isPlaying"
-      @click="playVideo"
-      class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition"
-    >
+    <button v-if="!props.isPlaying" @click="playVideo"
+      class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-24 h-24">
         <circle cx="24" cy="24" r="24" fill="black" fill-opacity="0.3" />
         <polygon points="19,15 36,24 19,33" fill="white" />
       </svg>
     </button>
 
-    <button
-      v-else
-      @click="pauseVideo"
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-             opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-    >
+    <button v-else @click="pauseVideo" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+             opacity-0 group-hover:opacity-100 transition-opacity duration-200">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="w-24 h-24">
         <circle cx="24" cy="24" r="24" fill="black" fill-opacity="0.3" />
         <rect x="16" y="15" width="5" height="18" fill="white" />
