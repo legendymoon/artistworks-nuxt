@@ -3,7 +3,7 @@
         <!-- Title and Metadata -->
         <h1 class="text-[44px] sm:text-[56px] font-bold mb-4">{{ level.charAt(0).toUpperCase() + level.slice(1) }}</h1>
         <div class="text-[12px] sm:text-[22px] text-gray-600 mb-8">
-            <span>{{ totalLessons  }} Topics</span>
+            <span>{{ totalLessons }} Topics</span>
             <span class="mx-1 sm:mx-2">•</span>
             <span>{{ totalLessonParts }} Lesson Videos</span>
             <span class="mx-1 sm:mx-2">•</span>
@@ -77,15 +77,16 @@ import LessonList from '@/components/lesson/LessonList.vue'
 const route = useRoute()
 const { lessons } = useLessons()
 const { courses } = useCourses()
-
 const { lessonParts } = useLessonParts()
-const courseSlug = computed(() => route.params.courseSlug as string)
-const level = computed(() => route.params.level as string)
 
+// Extract courseSlug and course from route params
+const courseSlug = computed(() => route.params.courseSlug as string)
 const course = computed(() =>
     courses.value.find(c => c.slug === courseSlug.value)
 )
 
+// Extract level from route params and filter lessons
+const level = computed(() => route.params.level as string)
 const lessonsInLevel = computed(() =>
     lessons.value.filter(
         l => l.courseId === course.value?.id &&
@@ -102,8 +103,55 @@ const lessonPartsInLevel = computed(() =>
 const totalLessons = computed(() => lessonsInLevel.value.length)
 const totalLessonParts = computed(() => lessonPartsInLevel.value.length)
 
+// Utility functions for lesson duration and progress
+function calculateLessonDuration(lessonId: number): number {
+    const parts = lessonParts.value.filter((p) => p.lessonId === lessonId)
+    return parts.reduce((sum, p) => sum + p.duration, 0)
+}
+
+function calculateLessonProgress(lessonId: number): number {
+    const parts = lessonParts.value.filter((p) => p.lessonId === lessonId)
+    const totalDuration = parts.reduce((sum, p) => sum + p.duration, 0)
+    const totalWatched = parts.reduce((sum, p) => sum + (p.duration * p.progress / 100), 0)
+    return totalDuration === 0 ? 0 : Math.floor((totalWatched / totalDuration) * 100)
+}
+
+function isLessonCompleted(lessonId: number): boolean {
+    return calculateLessonProgress(lessonId) === 100
+}
+
+function handleProgressUpdate({ id: lessonId }: { id: number }) {
+    lessonParts.value
+        .filter((p) => p.lessonId === lessonId)
+        .forEach((p) => {
+            p.progress = 100
+        })
+}
+
+// Decorate lessons with additional information
+const decoratedLessons = computed(() =>
+    filteredLessons.value.map((lesson) => ({
+        ...lesson,
+        duration: calculateLessonDuration(lesson.id),
+        progress: calculateLessonProgress(lesson.id),
+        completed: isLessonCompleted(lesson.id)
+    }))
+)
+
+// Search functionality
 const showSearch = ref(false)
 const searchQuery = ref('')
+const searchInput = ref<HTMLInputElement | null>(null)
+
+function activateSearch(e?: MouseEvent) {
+    e?.stopPropagation()
+    showSearch.value = true
+    nextTick(() => {
+        searchInput.value?.focus()
+    })
+}
+
+// Sort functionality
 const sortOptions = ['A-Z', 'Z-A', 'Most Recent', 'Most Viewed', 'Completed']
 const selectedSort = ref('Sort')
 const showSortDropdown = ref(false)
@@ -127,13 +175,43 @@ onMounted(() => {
     })
 })
 
-const searchInput = ref<HTMLInputElement | null>(null)
 
+const filteredLessons = computed(() => {
+    let filtered = lessonsInLevel.value.filter((lesson) =>
+        lesson.title.toLowerCase().includes(searchQuery.value.toLowerCase())
+    )
+
+    const sorted = [...filtered] // ← make a shallow copy
+
+    switch (selectedSort.value) {
+        case 'A-Z':
+            sorted.sort((a, b) => a.title.localeCompare(b.title))
+            break
+        case 'Z-A':
+            sorted.sort((a, b) => b.title.localeCompare(a.title))
+            break
+        case 'Most Recent':
+            sorted.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+            break
+        case 'Most Viewed':
+            sorted.sort((a, b) => (b.views || 0) - (a.views || 0))
+            break
+        case 'Completed':
+            sorted.sort((a, b) =>
+                Number(calculateLessonProgress(b.id)) - Number(calculateLessonProgress(a.id))
+            )
+            break
+    }
+
+    return sorted
+})
+
+// View modes
 const viewModes = ['list', 'compact', 'large'] as const
 type ViewMode = typeof viewModes[number]
 const view = ref<ViewMode>('list')
-
 const isDesktop = ref(true)
+
 onMounted(() => {
     isDesktop.value = window.innerWidth >= 1024
     window.addEventListener('resize', () => {
@@ -155,78 +233,4 @@ const getIconForView = (mode: ViewMode) => {
             return 'grid'
     }
 }
-
-
-function activateSearch(e?: MouseEvent) {
-    e?.stopPropagation()
-    showSearch.value = true
-    nextTick(() => {
-        searchInput.value?.focus()
-    })
-}
-
-function calculateLessonDuration(lessonId: number): number {
-    const parts = lessonParts.value.filter((p) => p.lessonId === lessonId)
-    return parts.reduce((sum, p) => sum + p.duration, 0)
-}
-
-function calculateLessonProgress(lessonId: number): number {
-    const parts = lessonParts.value.filter((p) => p.lessonId === lessonId)
-    const totalDuration = parts.reduce((sum, p) => sum + p.duration, 0)
-    const totalWatched = parts.reduce((sum, p) => sum + (p.duration * p.progress / 100), 0)
-    return totalDuration === 0 ? 0 : Math.floor((totalWatched / totalDuration) * 100)
-}
-
-function isLessonCompleted(lessonId: number): boolean {
-    return calculateLessonProgress(lessonId) === 100
-}
-
-const filteredLessons = computed(() => {
-  let filtered = lessonsInLevel.value.filter((lesson) =>
-    lesson.title.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-
-  const sorted = [...filtered] // ← make a shallow copy
-
-  switch (selectedSort.value) {
-    case 'A-Z':
-      sorted.sort((a, b) => a.title.localeCompare(b.title))
-      break
-    case 'Z-A':
-      sorted.sort((a, b) => b.title.localeCompare(a.title))
-      break
-    case 'Most Recent':
-      sorted.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-      break
-    case 'Most Viewed':
-      sorted.sort((a, b) => (b.views || 0) - (a.views || 0))
-      break
-    case 'Completed':
-      sorted.sort((a, b) =>
-        Number(calculateLessonProgress(b.id)) - Number(calculateLessonProgress(a.id))
-      )
-      break
-  }
-
-  return sorted
-})
-
-
-function handleProgressUpdate({ id: lessonId }: { id: number }) {
-    lessonParts.value
-        .filter((p) => p.lessonId === lessonId)
-        .forEach((p) => {
-            p.progress = 100
-        })
-}
-
-const decoratedLessons = computed(() =>
-    filteredLessons.value.map((lesson) => ({
-        ...lesson,
-        duration: calculateLessonDuration(lesson.id),
-        progress: calculateLessonProgress(lesson.id),
-        completed: isLessonCompleted(lesson.id)
-    }))
-)
-
 </script>

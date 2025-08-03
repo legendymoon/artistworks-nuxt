@@ -18,13 +18,15 @@
 import LevelCard from '@/components/lesson/LevelCard.vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCourses } from '@/composables/useCourses'
-
 const route = useRoute()
 const router = useRouter()
 
+// Extract courseSlug from route params
 const courseSlug = route.params.courseSlug as string
 const { courses } = useCourses()
 const course = courses.value.find(c => c.slug === courseSlug)
+
+// Prepare levels data
 const levels = course?.levels.map(level => {
   return {
     level,
