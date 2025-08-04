@@ -1,5 +1,6 @@
 <template>
     <div class="flex min-h-screen">
+        <!-- Left side gradient background -->
         <div class="hidden md:flex w-1/4 text-white relative overflow-hidden"
             style="background: linear-gradient(139.18deg, #1e3a8a 30%, #3b82f6 85%);">
             <div class="text-[52px] font-bold px-[42px] py-[59px] z-10">Welcome<br />Back</div>
@@ -7,13 +8,14 @@
                 class="absolute bottom-[-150px] left-[-190px] w-[450px] opacity-20 pointer-events-none select-none" />
         </div>
 
+        <!-- Right side login form -->
         <div class="w-full md:w-3/4 flex items-center justify-center px-6 sm:px-8 py-10">
             <div class="w-full max-w-md space-y-6">
                 <div class="flex justify-left">
                     <img src="/images/logo.png" alt="Logo" class="h-10" />
-                </div>
-
+                </div>             
                 <h2 class="text-left text-2xl font-bold">Sign in to ArtistWorks</h2>
+
                 <p class="text-left text-sm text-gray-500">
                     New user?
                     <a href="#" class="text-blue-700 font-medium hover:underline">Create an account.</a>

@@ -1,14 +1,9 @@
 <template>
-  <div
-    @click="onClick"
-    class="cursor-pointer bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl"
-  >
+  <div @click="onClick"
+    class="cursor-pointer bg-white rounded-lg shadow-md overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl">
     <div class="h-40 w-full overflow-hidden">
-      <img
-        :src="thumbnail"
-        alt=""
-        class="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-      />
+      <img :src="thumbnail" alt=""
+        class="object-cover w-full h-full transition-transform duration-300 hover:scale-105" />
     </div>
     <div class="p-4">
       <h3 class="text-lg font-semibold">{{ level }}</h3>

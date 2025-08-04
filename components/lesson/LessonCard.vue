@@ -36,12 +36,12 @@
     <div class="px-4 pb-4 pt-1 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
       <!-- Progress -->
       <LessonProgress :progress="lesson.progress" class="flex-1" />
-      
+
       <!-- Duration -->
       <span class="text-[#595959] text-xs px-2 py-0.5 rounded whitespace-nowrap hidden sm:inline">
         {{ formattedDuration }}
       </span>
-      
+
       <!-- Mobile Buttons -->
       <div class="flex justify-end gap-8 sm:gap-2 sm:hidden">
         <button @click.stop="toggleBookmark">
@@ -61,8 +61,9 @@ import { useRouter } from 'vue-router'
 import { formatSecondsToTime } from '@/utils/formatTime'
 import LessonProgress from './LessonProgress.vue'
 import Icon from '@/components/ui/Icon.vue'
-
 const router = useRouter()
+
+// Props and Emits
 const emit = defineEmits(['updateLessonProgress'])
 const props = defineProps<{
   lesson: any
@@ -71,8 +72,10 @@ const props = defineProps<{
   level: string
 }>()
 
+// Reactive lesson data
 const lesson = ref({ ...props.lesson })
 
+// Reactive state for bookmark and check
 const isBookmarked = ref(false)
 function toggleBookmark() {
   isBookmarked.value = !isBookmarked.value
@@ -88,13 +91,14 @@ function toggleCheck() {
   }
 }
 
+// Computed properties
 const isGrid = computed(() => props.view !== 'list')
 const formattedDuration = computed(() => formatSecondsToTime(lesson.value.duration))
 
+// Handle card click to navigate to lesson
 function handleCardClick(e: MouseEvent) {
   const target = e.target as HTMLElement
   if (target.closest('button')) return
   router.push(`/courses/${props.courseSlug}/${props.level}/${lesson.value.slug}`)
 }
-
 </script>

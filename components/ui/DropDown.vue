@@ -1,9 +1,5 @@
 <template>
-  <select
-    :value="modelValue"
-    @change="onChange"
-    class="border px-3 py-2 rounded"
-  >
+  <select :value="modelValue" @change="onChange" class="border px-3 py-2 rounded">
     <option v-for="item in items" :key="item" :value="item">{{ item }}</option>
   </select>
 </template>

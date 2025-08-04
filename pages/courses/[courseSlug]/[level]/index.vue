@@ -26,7 +26,6 @@
                             class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
                 </div>
-
                 <!-- Sort -->
                 <div class="relative" ref="sortRef">
                     <div @click="toggleSortDropdown"
@@ -175,7 +174,7 @@ onMounted(() => {
     })
 })
 
-
+// Filter and sort lessons based on search query and selected sort option
 const filteredLessons = computed(() => {
     let filtered = lessonsInLevel.value.filter((lesson) =>
         lesson.title.toLowerCase().includes(searchQuery.value.toLowerCase())

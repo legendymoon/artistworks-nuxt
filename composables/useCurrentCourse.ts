@@ -3,6 +3,7 @@ import { useRoute } from 'vue-router'
 
 const lastCourseSlug = ref<string | null>(null)
 
+// Composable to manage the current course based on route parameters
 export function useCurrentCourse() {
   const route = useRoute()
 

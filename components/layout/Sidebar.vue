@@ -5,21 +5,16 @@
            lg:translate-x-0 lg:static
            h-screen transition-width duration-300"
     :class="[!show ? '-translate-x-full' : '', collapsed ? 'w-20' : 'w-64']">
+    <!-- Logo -->
     <div class="flex items-center mx-4 h-20">
       <RouterLink to="/">
         <img src="/images/logo-white.png" alt="Logo" class="h-10 cursor-pointer" />
       </RouterLink>
     </div>
 
-    <div
-      class="relative mx-4 mt-4 border border-[#1f3a5f] rounded-lg p-3"
-      v-if="!collapsed"
-      ref="courseDropdownRef"
-    >
-      <button
-        class="flex items-center gap-3 w-full text-left"
-        @click="showCourseDropdown = !showCourseDropdown"
-      >
+    <!-- Course Dropdown -->
+    <div class="relative mx-4 mt-4 border border-[#1f3a5f] rounded-lg p-3" v-if="!collapsed" ref="courseDropdownRef">
+      <button class="flex items-center gap-3 w-full text-left" @click="showCourseDropdown = !showCourseDropdown">
         <img :src="`/images/${currentCourse?.avatar}`" :alt="currentCourse?.instructor" class="w-12 h-12 rounded-lg" />
         <div class="flex flex-col">
           <span class="text-sm font-medium leading-tight">{{ currentCourse?.category }}</span>
@@ -27,18 +22,12 @@
         </div>
         <Icon name="chevrons-up-down" class="ml-auto text-gray-400" />
       </button>
-
-      <div
-        v-if="showCourseDropdown"
-        class="absolute left-0 right-0 mt-2 bg-[#01142c] border border-[#1f3a5f] rounded-lg shadow-lg z-30"
-      >
+      <!-- Course Dropdown Menu -->
+      <div v-if="showCourseDropdown"
+        class="absolute left-0 right-0 mt-2 bg-[#01142c] border border-[#1f3a5f] rounded-lg shadow-lg z-30">
         <ul>
-          <li
-            v-for="course in courses"
-            :key="course.id"
-            @click="selectCourse(course)"
-            class="px-4 py-2 hover:bg-[#1f3a5f] cursor-pointer text-sm"
-          >
+          <li v-for="course in courses" :key="course.id" @click="selectCourse(course)"
+            class="px-4 py-2 hover:bg-[#1f3a5f] cursor-pointer text-sm">
             {{ course.title }}
           </li>
         </ul>
@@ -112,33 +101,44 @@
 import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
-import { onClickOutside } from '@vueuse/core'
-import SidebarLink from '@/components/layout/SidebarLink.vue'
-import Icon from '@/components/ui/Icon.vue'
+import { useClickOutside } from '@/composables/useClickOutside'
 import { useCourses } from '@/composables/useCourses'
 import { useCurrentCourse } from '@/composables/useCurrentCourse'
 import { Course } from '@/types/course'
+import SidebarLink from '@/components/layout/SidebarLink.vue'
+import Icon from '@/components/ui/Icon.vue'
 
-const route = useRoute()
+// Props and Emits
 const router = useRouter()
+const props = defineProps<{ show: boolean; collapsed: boolean }>()
+const emit = defineEmits(['toggleCollapse', 'close'])
 
+// Refs
+const showCourseDropdown = ref(false)
+const courseDropdownRef = ref(null)
+const showAccountDropdown = ref(false)
+const dropdownRef = ref(null)
+
+// Handle Sign Out
+const { logout } = useAuth()
+
+function handleSignOut() {
+  logout()
+  router.push('/login')
+}
+
+useClickOutside(dropdownRef, () => {
+  showAccountDropdown.value = false
+})
+
+// Course Dropdown
 const { courses } = useCourses()
 const { currentCourseSlug } = useCurrentCourse()
 const currentCourse = computed(() =>
   courses.value.find(c => c.slug === currentCourseSlug.value)
 )
 
-const props = defineProps<{ show: boolean; collapsed: boolean }>()
-const emit = defineEmits(['toggleCollapse', 'close'])
-
-const showAccountDropdown = ref(false)
-const dropdownRef = ref(null)
-const { logout } = useAuth()
-
-const showCourseDropdown = ref(false)
-const courseDropdownRef = ref(null)
-
-onClickOutside(courseDropdownRef, () => {
+useClickOutside(courseDropdownRef, () => {
   showCourseDropdown.value = false
 })
 
@@ -146,14 +146,4 @@ function selectCourse(course: Course) {
   showCourseDropdown.value = false
   router.push(`/courses/${course.slug}`)
 }
-
-function handleSignOut() {
-  logout()
-  router.push('/login')
-}
-
-onClickOutside(dropdownRef, () => {
-  showAccountDropdown.value = false
-})
-
 </script>
