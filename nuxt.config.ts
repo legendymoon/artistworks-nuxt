@@ -1,4 +1,3 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
 
     typescript: {
@@ -15,5 +14,9 @@ export default defineNuxtConfig({
         },
     },
 
-  
+    runtimeConfig: {
+        public: {
+            videoBaseUrl: process.env.NUXT_PUBLIC_VIDEO_BASE_URL
+        }
+    },
 })
