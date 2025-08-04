@@ -82,6 +82,19 @@ function onVideoProgress({ currentTime, duration }: { currentTime: number, durat
     part.progress = progressPercent
   }
 }
+
+// Computed properties for lesson navigation
+const currentLessonIndex = computed(() =>
+  lessonsInLevel.value.findIndex(l => l.slug === lessonSlug)
+)
+
+const hasPreviousLesson = computed(() =>
+  currentLessonIndex.value > 0
+)
+
+const hasNextLesson = computed(() =>
+  currentLessonIndex.value < lessonsInLevel.value.length - 1
+)
 </script>
 
 <template>
@@ -146,10 +159,13 @@ function onVideoProgress({ currentTime, duration }: { currentTime: number, durat
 
     <!-- Navigation buttons for next/previous lesson -->
     <div class="mt-10 flex justify-between">
-      <button @click="goToPreviousLesson" class="bg-gray-100 hover:bg-gray-200 text-sm px-4 py-4 rounded-[100px]">
+      <button @click="goToPreviousLesson" :disabled="!hasPreviousLesson"
+        class="border-gray-200 border hover:bg-gray-200 text-sm px-4 py-4 rounded-[100px] disabled:hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed">
         Previous Lesson
       </button>
-      <button @click="goToNextLesson" class="bg-gray-100 hover:bg-gray-200 text-sm px-4 py-4 rounded-[100px]">
+
+      <button @click="goToNextLesson" :disabled="!hasNextLesson"
+        class="border-gray-200 border hover:bg-gray-200 text-sm px-4 py-4 rounded-[100px] disabled:hover:bg-transparent disabled:opacity-50 disabled:cursor-not-allowed">
         Next Lesson
       </button>
     </div>
