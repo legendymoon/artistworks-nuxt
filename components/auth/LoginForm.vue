@@ -64,7 +64,7 @@ const router = useRouter()
 const handleSubmit = () => {
     const success = login(username.value, password.value)
     if (success) {
-        router.push('/')
+        router.push('/courses/jazz-guitar-lessons-dave-stryker')
     } else {
         alert('Invalid credentials')
     }

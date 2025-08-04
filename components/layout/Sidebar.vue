@@ -17,7 +17,7 @@
       <button class="flex items-center gap-3 w-full text-left" @click="showCourseDropdown = !showCourseDropdown">
         <img :src="`/images/${currentCourse?.avatar}`" :alt="currentCourse?.instructor" class="w-12 h-12 rounded-lg" />
         <div class="flex flex-col">
-          <span class="text-sm font-medium leading-tight">{{ currentCourse?.category }}</span>
+          <span class="text-sm font-medium leading-tight">{{ currentCourse?.category }} with</span>
           <span class="text-sm font-medium leading-tight">{{ currentCourse?.instructor }}</span>
         </div>
         <Icon name="chevrons-up-down" class="ml-auto text-gray-400" />
