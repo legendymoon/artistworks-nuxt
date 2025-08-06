@@ -7,7 +7,8 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev",
+    "dev": "nuxt dev --host 0.0.0.0",
+    "start": "nuxt start",
     "test": "vitest",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
