@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import { useAuth } from '@/composables/useAuth'
-const { isAuthenticated } = useAuth()
-
-if (process.client) {
-  navigateTo(isAuthenticated.value ? '/' : '/login')
-}
+// Removed redirection logic to avoid eye blinking issue
 </script>
 
 <template>

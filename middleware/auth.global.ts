@@ -1,5 +1,5 @@
 export default defineNuxtRouteMiddleware((to) => {
-  const publicPages = ['/', '/login']
+  const publicPages = ['/login']
   const isPublic = publicPages.includes(to.path)
   const token = useCookie('auth_token')
 
@@ -11,5 +11,10 @@ export default defineNuxtRouteMiddleware((to) => {
   // Redirect to home if authenticated and trying to access login page
   if (token.value && to.path === '/login') {
     return navigateTo('/')
+  }
+
+  // Redirect to login if visiting the root route and not authenticated
+  if (!token.value && to.path === '/') {
+    return navigateTo('/login')
   }
 })
